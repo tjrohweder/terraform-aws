@@ -145,7 +145,7 @@ USERDATA
 }
 
 resource "aws_launch_configuration" "eks_launch_config" {
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   iam_instance_profile        = "${aws_iam_instance_profile.prod-node.name}"
   image_id                    = "${data.aws_ami.eks-worker.id}"
   instance_type               = "m5.large"
