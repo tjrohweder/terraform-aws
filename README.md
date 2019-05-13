@@ -1,11 +1,11 @@
 # Terraform AWS
 Terraform scripts for AWS EKS
 
-##Requirements
+## Requirements
 - You must have aws cli configured
 - The required terraform version is 0.11.13 or higher
 
-##Instructions
+## Instructions
 - Change tfvars values with your environment preferences
 - Execute `terraform apply` and type yes to deploy the infrastructure
 - Install kubectl following these instructions - [https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html]
