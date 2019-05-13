@@ -10,11 +10,10 @@ resource "aws_vpc" "k8s" {
 }
 
 resource "aws_subnet" "private" {
-  count                   = 4
-  vpc_id                  = "${aws_vpc.k8s.id}"
-  availability_zone       = "${element(data.aws_availability_zones.available.names, count.index)}"
-  cidr_block              = "${cidrsubnet(var.vpc_cidr, 4, count.index + 1)}"
-  map_public_ip_on_launch = false
+  count             = 4
+  vpc_id            = "${aws_vpc.k8s.id}"
+  availability_zone = "${element(data.aws_availability_zones.available.names, count.index)}"
+  cidr_block        = "${cidrsubnet(var.vpc_cidr, 4, count.index + 1)}"
 
   tags = {
     Name = "private-subnet-${count.index + 1}"
