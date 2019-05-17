@@ -54,12 +54,12 @@ resource "aws_security_group" "prod_cluster" {
 }
 
 resource "aws_security_group_rule" "prod_cluster_ingress-workstation-https" {
-  cidr_blocks       = ["10.0.0.0/16"]
+  cidr_blocks       = ["0.0.0.0/0"]
   description       = "Allow workstation to communicate with the cluster API Server"
-  from_port         = 443
-  protocol          = "tcp"
+  from_port         = 0
+  protocol          = "-1"
   security_group_id = "${aws_security_group.prod_cluster.id}"
-  to_port           = 443
+  to_port           = 0
   type              = "ingress"
 }
 
