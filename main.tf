@@ -9,7 +9,7 @@ terraform {
 }
 
 provider "aws" {
-  version                 = ">= 2.10"
+  version                 = ">= 2.11"
   profile                 = "${var.profile}"
   shared_credentials_file = "~/.aws/credentials"
   region                  = "${var.aws_region}"
