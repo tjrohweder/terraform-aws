@@ -25,8 +25,9 @@ module "vpc" {
 }
 
 module "eks" {
-  source          = "./modules/eks"
-  vpc_id          = "${module.vpc.vpc_id}"
-  cluster_name    = "${var.cluster_name}"
-  private_subnets = "${module.vpc.private_subnets}"
+  source                = "./modules/eks"
+  vpc_id                = "${module.vpc.vpc_id}"
+  cluster_name          = "${var.cluster_name}"
+  private_subnets       = "${module.vpc.private_subnets}"
+  workers_instance_type = "${var.workers_instance_type}"
 }

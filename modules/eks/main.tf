@@ -148,7 +148,7 @@ resource "aws_launch_configuration" "eks_launch_config" {
   associate_public_ip_address = false
   iam_instance_profile        = "${aws_iam_instance_profile.prod-node.name}"
   image_id                    = "${data.aws_ami.eks-worker.id}"
-  instance_type               = "m5.large"
+  instance_type               = "${var.workers_instance_type}"
   name_prefix                 = "eks-node"
   security_groups             = ["${aws_security_group.prod-node.id}"]
   user_data_base64            = "${base64encode(local.prod_node_userdata)}"
