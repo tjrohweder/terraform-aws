@@ -3,7 +3,7 @@ Terraform scripts for AWS EKS
 
 ## Requirements
 - You must have aws cli configured
-- The required terraform version is 0.11.13 or higher
+- The required terraform version is 0.14.1 or higher
 
 ## Instructions
 - Change tfvars values with your environment preferences
