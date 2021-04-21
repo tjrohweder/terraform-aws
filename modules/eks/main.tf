@@ -29,17 +29,17 @@ POLICY
 
 resource "aws_iam_role_policy_attachment" "prod_cluster_AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = "${aws_iam_role.prod_cluster.name}"
+  role       = aws_iam_role.prod_cluster.name
 }
 
 resource "aws_iam_role_policy_attachment" "prod_cluster_AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
-  role       = "${aws_iam_role.prod_cluster.name}"
+  role       = aws_iam_role.prod_cluster.name
 }
 
 resource "aws_security_group" "prod_cluster" {
   name   = "prod_cluster_sg"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 
   egress {
     from_port   = 0
@@ -58,14 +58,14 @@ resource "aws_security_group_rule" "prod_cluster_ingress-workstation-https" {
   description       = "Allow workstation to communicate with the cluster API Server"
   from_port         = 0
   protocol          = "-1"
-  security_group_id = "${aws_security_group.prod_cluster.id}"
+  security_group_id = aws_security_group.prod_cluster.id
   to_port           = 0
   type              = "ingress"
 }
 
 resource "aws_security_group" "prod-node" {
   name   = "prod-node-sg"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 
   egress {
     from_port   = 0
@@ -74,35 +74,33 @@ resource "aws_security_group" "prod-node" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = "${
-    map(
-     "Name", "Worker Nodes Security Group",
-     "kubernetes.io/cluster/${var.cluster_name}", "owned",
-    )
-  }"
+  tags = {
+     "Name" = "Worker Nodes Security Group",
+     "kubernetes.io/cluster/${var.cluster_name}" =  "owned"
+  }
 }
 
 resource "aws_security_group_rule" "prod_node_ingress-workstation-https" {
   cidr_blocks       = ["0.0.0.0/0"]
   from_port         = 0
   protocol          = "-1"
-  security_group_id = "${aws_security_group.prod-node.id}"
+  security_group_id = aws_security_group.prod-node.id
   to_port           = 0
   type              = "ingress"
 }
 
 resource "aws_eks_cluster" "prod_cluster" {
-  name     = "${var.cluster_name}"
-  role_arn = "${aws_iam_role.prod_cluster.arn}"
+  name     = var.cluster_name
+  role_arn = aws_iam_role.prod_cluster.arn
 
   vpc_config {
-    security_group_ids = ["${aws_security_group.prod_cluster.id}"]
-    subnet_ids         = ["${var.private_subnets}"]
+    security_group_ids = [aws_security_group.prod_cluster.id]
+    subnet_ids         = [for value in var.private_subnets: value]
   }
 
   depends_on = [
-    "aws_iam_role_policy_attachment.prod_cluster_AmazonEKSClusterPolicy",
-    "aws_iam_role_policy_attachment.prod_cluster_AmazonEKSServicePolicy",
+    aws_iam_role_policy_attachment.prod_cluster_AmazonEKSClusterPolicy,
+    aws_iam_role_policy_attachment.prod_cluster_AmazonEKSServicePolicy,
   ]
 }
 
@@ -127,22 +125,22 @@ POLICY
 
 resource "aws_iam_role_policy_attachment" "eks-prod-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = "${aws_iam_role.prod-node.name}"
+  role       = aws_iam_role.prod-node.name
 }
 
 resource "aws_iam_role_policy_attachment" "prod-node-AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = "${aws_iam_role.prod-node.name}"
+  role       = aws_iam_role.prod-node.name
 }
 
 resource "aws_iam_role_policy_attachment" "prod-node-AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = "${aws_iam_role.prod-node.name}"
+  role       = aws_iam_role.prod-node.name
 }
 
 resource "aws_iam_instance_profile" "prod-node" {
   name = "prod-node"
-  role = "${aws_iam_role.prod-node.name}"
+  role = aws_iam_role.prod-node.name
 }
 
 locals {
@@ -155,12 +153,12 @@ USERDATA
 
 resource "aws_launch_configuration" "eks_launch_config" {
   associate_public_ip_address = false
-  iam_instance_profile        = "${aws_iam_instance_profile.prod-node.name}"
-  image_id                    = "${data.aws_ami.eks-worker.id}"
-  instance_type               = "${var.workers_instance_type}"
+  iam_instance_profile        = aws_iam_instance_profile.prod-node.name
+  image_id                    = data.aws_ami.eks-worker.id
+  instance_type               = var.workers_instance_type
   name_prefix                 = "eks-node"
-  security_groups             = ["${aws_security_group.prod-node.id}"]
-  user_data_base64            = "${base64encode(local.prod_node_userdata)}"
+  security_groups             = [aws_security_group.prod-node.id]
+  user_data_base64            = base64encode(local.prod_node_userdata)
 
   lifecycle {
     create_before_destroy = true
@@ -169,11 +167,11 @@ resource "aws_launch_configuration" "eks_launch_config" {
 
 resource "aws_autoscaling_group" "eks_nodes_autoscaling" {
   desired_capacity     = 3
-  launch_configuration = "${aws_launch_configuration.eks_launch_config.id}"
+  launch_configuration = aws_launch_configuration.eks_launch_config.id
   max_size             = 15
   min_size             = 3
   name                 = "eks_nodes"
-  vpc_zone_identifier  = ["${var.private_subnets}"]
+  vpc_zone_identifier  = [for i in var.private_subnets: i]
 
   tag {
     key                 = "Name"
