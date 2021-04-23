@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = ">= 3.37"
   }
-  
+
   backend "s3" {
     bucket = "tjrohweder-eks-state"
     key    = "terraform.tfstate"
