@@ -4,17 +4,13 @@ terraform {
     aws = ">= 3.37"
   }
 
-  backend "s3" {
-    bucket = "tjrohweder-eks-state"
-    key    = "terraform.tfstate"
-    region = "us-east-1"
-  }
-}
+  backend "remote" {
+    organization = "tjrohweder"
 
-provider "aws" {
-  profile                 = var.profile
-  shared_credentials_file = "~/.aws/credentials"
-  region                  = var.aws_region
+    workspaces {
+      name = "Development"
+    }
+  }
 }
 
 module "vpc" {

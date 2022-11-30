@@ -165,27 +165,6 @@ resource "aws_launch_configuration" "eks_launch_config" {
   }
 }
 
-resource "aws_autoscaling_group" "eks_nodes_autoscaling" {
-  desired_capacity     = 3
-  launch_configuration = aws_launch_configuration.eks_launch_config.id
-  max_size             = 15
-  min_size             = 3
-  name                 = "eks_nodes"
-  vpc_zone_identifier  = [for i in var.private_subnets: i]
-
-  tag {
-    key                 = "Name"
-    value               = "eks-prod-nodes"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "kubernetes.io/cluster/${var.cluster_name}"
-    value               = "owned"
-    propagate_at_launch = true
-  }
-}
-
 locals {
   config_map_aws_auth = <<CONFIGMAPAWSAUTH
 
