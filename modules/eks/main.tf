@@ -91,6 +91,7 @@ resource "aws_security_group_rule" "prod_node_ingress-workstation-https" {
 
 resource "aws_eks_cluster" "prod_cluster" {
   name     = var.cluster_name
+  version  = "1.23"
   role_arn = aws_iam_role.prod_cluster.arn
 
   vpc_config {
