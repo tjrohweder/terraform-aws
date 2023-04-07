@@ -127,3 +127,9 @@ resource "aws_iam_policy" "grafana" {
     ]
   })
 }
+
+resource "aws_iam_policy_attachment" "grafana" {
+  name       = "GrafanaReadPermission"
+  roles      = [aws_iam_role.grafana.name]
+  policy_arn = aws_iam_policy.grafana.arn
+}
