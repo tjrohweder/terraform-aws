@@ -13,6 +13,8 @@ terraform {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 module "vpc" {
   source          = "./modules/vpc"
   vpc_cidr        = var.vpc_cidr
@@ -28,4 +30,100 @@ module "eks" {
   cluster_name          = var.cluster_name
   private_subnets       = module.vpc.private_subnets
   workers_instance_type = var.workers_instance_type
+  eks_addons            = var.eks_addons
+}
+
+module "managed-service-prometheus" {
+  source          = "terraform-aws-modules/managed-service-prometheus/aws"
+  version         = "2.2.2"
+  workspace_alias = "amp"
+}
+
+resource "aws_iam_policy" "amp" {
+  name = "PrometheusWritePermission"
+  path = "/"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "aps:RemoteWrite",
+        ]
+        Effect   = "Allow"
+        Resource = "${module.managed-service-prometheus.workspace_arn}"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "amp" {
+  name = "PrometheusWritePermission"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Federated" : "arn:aws:iam::${data.aws_caller_identity.current.id}:oidc-provider/${trimprefix(module.eks.oidc_issuer, "https://")}"
+        },
+        "Action" : "sts:AssumeRoleWithWebIdentity",
+        "Condition" : {
+          "StringEquals" : {
+            "${trimprefix(module.eks.oidc_issuer, "https://")}:aud" : "sts.amazonaws.com",
+            "${trimprefix(module.eks.oidc_issuer, "https://")}:sub" : "system:serviceaccount:prometheus:amp-iamproxy-ingest"
+          }
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "amp" {
+  name       = "PrometheusWritePermission"
+  roles      = [aws_iam_role.amp.name]
+  policy_arn = aws_iam_policy.amp.arn
+}
+
+resource "aws_iam_role" "grafana" {
+  name = "GrafanaReadPermission"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Version" : "2012-10-17",
+        "Statement" : [
+          {
+            "Effect" : "Allow",
+            "Principal" : {
+              "AWS" : "arn:aws:iam::${var.platform_account_id}:grafana"
+            },
+            "Action" : "sts:AssumeRole",
+            "Condition" : {}
+          }
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "grafana" {
+  name = "GrafanaReadPermission"
+  path = "/"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "aps:GetLabels",
+          "aps:GetMetricMetadata",
+          "aps:GetSeries",
+          "aps:QueryMetrics"
+        ]
+        Effect   = "Allow"
+        Resource = "${module.managed-service-prometheus.workspace_arn}"
+      },
+    ]
+  })
 }

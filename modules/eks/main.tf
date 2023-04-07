@@ -8,6 +8,13 @@ data "aws_ami" "eks-worker" {
   owners      = ["602401143452"]
 }
 
+data "aws_eks_addon_version" "this" {
+  count              = length(var.eks_addons)
+  addon_name         = element(var.eks_addons, count.index)
+  kubernetes_version = aws_eks_cluster.prod_cluster.version
+  most_recent        = true
+}
+
 resource "aws_iam_role" "prod_cluster" {
   name = "prod-eks-cluster"
 
@@ -152,18 +159,12 @@ set -o xtrace
 USERDATA
 }
 
-resource "aws_launch_configuration" "eks_launch_config" {
-  associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.prod-node.name
-  image_id                    = data.aws_ami.eks-worker.id
-  instance_type               = var.workers_instance_type
-  name_prefix                 = "eks-node"
-  security_groups             = [aws_security_group.prod-node.id]
-  user_data_base64            = base64encode(local.prod_node_userdata)
-
-  lifecycle {
-    create_before_destroy = true
-  }
+resource "aws_eks_addon" "this" {
+  count             = length(var.eks_addons)
+  cluster_name      = aws_eks_cluster.prod_cluster.name
+  addon_name        = element(var.eks_addons, count.index)
+  addon_version     = data.aws_eks_addon_version.this.*.version[count.index]
+  resolve_conflicts = "OVERWRITE"
 }
 
 locals {

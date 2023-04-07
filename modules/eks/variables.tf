@@ -6,3 +6,7 @@ variable "private_subnets" {
 }
 
 variable "workers_instance_type" {}
+
+variable "eks_addons" {
+  type = list(string)
+}
