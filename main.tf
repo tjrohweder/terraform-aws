@@ -79,32 +79,27 @@ resource "aws_iam_role" "amp" {
   })
 }
 
-resource "aws_iam_policy_attachment" "amp" {
-  name       = "PrometheusWritePermission"
-  roles      = [aws_iam_role.amp.name]
-  policy_arn = aws_iam_policy.amp.arn
-}
-
 resource "aws_iam_role" "grafana" {
   name = "GrafanaReadPermission"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        "Version" : "2012-10-17",
-        "Statement" : [
-          {
             "Effect" : "Allow",
             "Principal" : {
               "AWS" : "arn:aws:iam::${var.platform_account_id}:grafana"
             },
             "Action" : "sts:AssumeRole",
             "Condition" : {}
-          }
-        ]
-      },
-    ]
+        }
+     ]
   })
+}
+
+resource "aws_iam_policy_attachment" "amp" {
+  name       = "PrometheusWritePermission"
+  roles      = [aws_iam_role.amp.name]
+  policy_arn = aws_iam_policy.amp.arn
 }
 
 resource "aws_iam_policy" "grafana" {
