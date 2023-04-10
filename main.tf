@@ -85,14 +85,14 @@ resource "aws_iam_role" "grafana" {
     Version = "2012-10-17"
     Statement = [
       {
-            "Effect" : "Allow",
-            "Principal" : {
-              "AWS" : "arn:aws:iam::${var.platform_account_id}:grafana"
-            },
-            "Action" : "sts:AssumeRole",
-            "Condition" : {}
-        }
-     ]
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${var.platform_account_id}:grafana"
+        },
+        "Action" : "sts:AssumeRole",
+        "Condition" : {}
+      },
+    ]
   })
 }
 
