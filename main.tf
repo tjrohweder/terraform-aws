@@ -82,16 +82,16 @@ resource "aws_iam_role" "amp" {
 resource "aws_iam_role" "grafana" {
   name = "GrafanaReadPermission"
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.platform_account_id}:grafana"
+          "AWS" : "arn:aws:iam::528964206988:grafana"
         },
         "Action" : "sts:AssumeRole",
         "Condition" : {}
-      },
+      }
     ]
   })
 }
