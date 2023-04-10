@@ -89,7 +89,7 @@ resource "aws_iam_role" "grafana" {
         Effect = "Allow"
         Sid    = ""
         Principal = {
-          AWS = "arn:aws:iam::528964206988:assumed-role/role-name/grafana"
+          AWS = "arn:aws:iam::528964206988:role/grafana"
         }
       },
     ]
