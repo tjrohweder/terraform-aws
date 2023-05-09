@@ -1,9 +1,21 @@
-variable "profile" {}
-variable "aws_region" {}
-variable "vpc_cidr" {}
-variable "cluster_name" {}
-variable "workers_instance_type" {}
-variable "platform_account_id" {}
-variable "eks_addons" {
+variable "az_names" {
   type = list(string)
+}
+variable "vpc_name" {
+  type = string
+}
+variable "vpc_cidr" {
+  type = string
+}
+variable "private_subnets" {
+  type = list(string)
+}
+variable "public_subnets" {
+  type = list(string)
+}
+variable "cluster_name" {
+  type = string
+}
+variable "cluster_version" {
+  type = string
 }
