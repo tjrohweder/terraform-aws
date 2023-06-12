@@ -46,7 +46,6 @@ module "eks" {
     }
   }
 
-  # aws-auth configmap
   manage_aws_auth_configmap = true
 
   tags = {
