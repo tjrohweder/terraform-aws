@@ -28,18 +28,10 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    blue = {
-      desired_capacity = 1
+    infra = {
+      desired_capacity = 2
       min_size         = 1
       max_size         = 10
-
-      instance_types = ["t3a.large"]
-    capacity_type = "ON_DEMAND" }
-
-    green = {
-      min_size     = 1
-      max_size     = 10
-      desired_size = 1
 
       instance_types = ["t3a.large"]
       capacity_type  = "ON_DEMAND"
