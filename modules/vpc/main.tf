@@ -13,7 +13,8 @@ module "vpc" {
   enable_vpn_gateway = false
 
   tags = {
-    Terraform   = "true"
-    Environment = "${var.environment}"
+    Terraform                = "true"
+    Environment              = "${var.environment}"
+    "karpenter.sh/discovery" = "main"
   }
 }

@@ -41,7 +41,8 @@ module "eks" {
   manage_aws_auth_configmap = true
 
   tags = {
-    Environment = "${var.environment}"
-    Terraform   = "true"
+    Environment              = "${var.environment}"
+    Terraform                = "true"
+    "karpenter.sh/discovery" = "main"
   }
 }
