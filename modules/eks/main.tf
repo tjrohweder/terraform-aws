@@ -46,3 +46,70 @@ module "eks" {
     "karpenter.sh/discovery" = "main"
   }
 }
+
+module "karpenter_policy" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "~> 3.0"
+
+  name        = "karpenter-policy-infra"
+  path        = "/"
+  description = "karpenter_policy-infra"
+
+  policy = <<EOF
+{
+    "Statement": [
+        {
+            "Action": [
+                "ssm:GetParameter",
+                "ec2:DescribeImages",
+                "ec2:RunInstances",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeLaunchTemplates",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInstanceTypes",
+                "ec2:DescribeInstanceTypeOfferings",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DeleteLaunchTemplate",
+                "ec2:CreateTags",
+                "ec2:CreateLaunchTemplate",
+                "ec2:CreateFleet",
+                "ec2:DescribeSpotPriceHistory",
+                "pricing:GetProducts"
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "Karpenter"
+        },
+        {
+            "Action": "ec2:TerminateInstances",
+            "Condition": {
+                "StringLike": {
+                    "ec2:ResourceTag/Name": "*karpenter*"
+                }
+            },
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "ConditionalEC2Termination"
+        }
+    ],
+    "Version": "2012-10-17"
+}
+EOF
+}
+
+module "iam_eks_role" {
+  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  role_name = "karpenter"
+
+  role_policy_arns = {
+    policy = "${module.karpenter_policy.arn}"
+  }
+
+  oidc_providers = {
+    one = {
+      provider_arn               = "arn:aws:iam::872675253839:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/639C9FE274B779F6DA0B589B8CB46A28"
+      namespace_service_accounts = ["karpenter:karpenter"]
+    }
+  }
+}
