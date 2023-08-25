@@ -92,7 +92,13 @@ module "karpenter_policy" {
             "Effect": "Allow",
             "Resource": "*",
             "Sid": "ConditionalEC2Termination"
-        }
+        },
+        {
+            "Effect": "Allow",
+            "Action": "eks:DescribeCluster",
+            "Resource": "*",
+            "Sid": "EKSClusterEndpointLookup"
+        }        
     ],
     "Version": "2012-10-17"
 }
