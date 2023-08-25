@@ -29,7 +29,7 @@ module "eks" {
 
   eks_managed_node_groups = {
     infra = {
-      desired_capacity = 3
+      desired_capacity = 2
       min_size         = 1
       max_size         = 10
 
@@ -115,7 +115,7 @@ module "iam_eks_role" {
 
   oidc_providers = {
     one = {
-      provider_arn               = "arn:aws:iam::872675253839:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/610B28FA9CE3624B5D04EDCFF1E821ED"
+      provider_arn               = "arn:aws:iam::872675253839:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/00D1DC25D3F21846E344589BA18A9ED1"
       namespace_service_accounts = ["karpenter:karpenter"]
     }
   }
