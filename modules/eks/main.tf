@@ -29,7 +29,7 @@ module "eks" {
 
   eks_managed_node_groups = {
     infra = {
-      desired_capacity = 2
+      desired_capacity = 3
       min_size         = 1
       max_size         = 10
 
