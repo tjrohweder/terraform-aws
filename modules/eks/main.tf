@@ -100,7 +100,7 @@ EOF
 
 module "iam_eks_role" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name = "karpenter"
+  role_name = "KarpenterControllerRole"
 
   role_policy_arns = {
     policy = "${module.karpenter_policy.arn}"
