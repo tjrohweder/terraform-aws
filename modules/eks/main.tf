@@ -66,8 +66,6 @@ module "karpenter" {
 
   irsa_oidc_provider_arn          = module.eks.oidc_provider_arn
   irsa_namespace_service_accounts = ["karpenter:karpenter"]
-  iam_role_name                   = "KarpenterController"
-  irsa_name                       = "karpenter-irsa"
 
   tags = {
     Terraform = "true"
