@@ -115,7 +115,7 @@ module "iam_eks_role" {
 }
 
 resource "aws_iam_role" "karpenter" {
-  name = "Karpenter"
+  name = "KarpenterNodeRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
