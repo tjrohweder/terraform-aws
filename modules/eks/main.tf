@@ -75,7 +75,8 @@ module "karpenter_policy" {
                 "ec2:CreateLaunchTemplate",
                 "ec2:CreateFleet",
                 "ec2:DescribeSpotPriceHistory",
-                "pricing:GetProducts"
+                "pricing:GetProducts",
+                "sts:AssumeRoleWithWebIdentity"
             ],
             "Effect": "Allow",
             "Resource": "*",
