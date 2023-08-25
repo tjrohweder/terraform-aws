@@ -109,7 +109,7 @@ module "iam_eks_role" {
 
   oidc_providers = {
     one = {
-      provider_arn               = "arn:aws:iam::872675253839:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/639C9FE274B779F6DA0B589B8CB46A28"
+      provider_arn               = "arn:aws:iam::872675253839:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/610B28FA9CE3624B5D04EDCFF1E821ED"
       namespace_service_accounts = ["karpenter:karpenter"]
     }
   }
