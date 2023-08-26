@@ -72,12 +72,13 @@ module "karpenter_policy" {
 
   policy = <<EOF
 {
+    "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "MergedAllowAllActions",
+            "Effect": "Allow",
+            "Resource": "*",
             "Action": [
-                "ssm:GetParameter",
-                "ec2:DescribeImages",
-                "ec2:RunInstances",
                 "ec2:DescribeSubnets",
                 "ec2:DescribeSecurityGroups",
                 "ec2:DescribeLaunchTemplates",
@@ -85,37 +86,75 @@ module "karpenter_policy" {
                 "ec2:DescribeInstanceTypes",
                 "ec2:DescribeInstanceTypeOfferings",
                 "ec2:DescribeAvailabilityZones",
-                "ec2:DeleteLaunchTemplate",
                 "ec2:CreateTags",
                 "ec2:CreateLaunchTemplate",
                 "ec2:CreateFleet",
+                "ec2:DescribeImages",
                 "ec2:DescribeSpotPriceHistory",
                 "pricing:GetProducts",
-                "sts:AssumeRoleWithWebIdentity"
-            ],
-            "Effect": "Allow",
-            "Resource": "*",
-            "Sid": "Karpenter"
+                "ssm:GetParameter",
+                "iam:PassRole",
+                "eks:DescribeCluster"
+            ]
         },
         {
-            "Action": "ec2:TerminateInstances",
+            "Sid": "ConditionalEC2TerminationMain",
+            "Effect": "Allow",
+            "Resource": "*",
+            "Action": [
+                "ec2:TerminateInstances",
+                "ec2:DeleteLaunchTemplate"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "ec2:ResourceTag/karpenter.sh/discovery": "main"
+                }
+            }
+        },
+        {
+            "Sid": "ConditionalEC2TerminationKarpenter",
+            "Effect": "Allow",
+            "Resource": "*",
+            "Action": [
+                "ec2:TerminateInstances"
+            ],
             "Condition": {
                 "StringLike": {
                     "ec2:ResourceTag/Name": "*karpenter*"
                 }
-            },
-            "Effect": "Allow",
-            "Resource": "*",
-            "Sid": "ConditionalEC2Termination"
+            }
         },
         {
+            "Sid": "ConditionalRunInstancesMain",
             "Effect": "Allow",
-            "Action": "eks:DescribeCluster",
-            "Resource": "*",
-            "Sid": "EKSClusterEndpointLookup"
-        }        
-    ],
-    "Version": "2012-10-17"
+            "Resource": [
+                "arn:aws:ec2:*:872675253839:subnet/*",
+                "arn:aws:ec2:*:872675253839:security-group/*",
+                "arn:aws:ec2:*:872675253839:launch-template/*"
+            ],
+            "Action": [
+                "ec2:RunInstances"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "ec2:ResourceTag/karpenter.sh/discovery": "main"
+                }
+            }
+        },
+        {
+            "Sid": "UnconditionalRunInstances",
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:ec2:*::image/*",
+                "arn:aws:ec2:*:872675253839:volume/*",
+                "arn:aws:ec2:*:872675253839:network-interface/*",
+                "arn:aws:ec2:*:872675253839:instance/*"
+            ],
+            "Action": [
+                "ec2:RunInstances"
+            ]
+        }
+    ]
 }
 EOF
 }
