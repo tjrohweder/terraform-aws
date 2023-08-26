@@ -41,17 +41,6 @@ module "eks" {
   #  create_aws_auth_configmap = true
   #  manage_aws_auth_configmap = true
 
-  aws_auth_roles = [
-    {
-      rolearn  = module.karpenter.role_arn
-      username = "system:node:{{EC2PrivateDNSName}}"
-      groups = [
-        "system:bootstrappers",
-        "system:nodes",
-      ]
-    },
-  ]
-
   tags = {
     Environment              = "${var.environment}"
     Terraform                = "true"
@@ -59,7 +48,7 @@ module "eks" {
   }
 }
 
-module "karpenter" {
+/*module "karpenter" {
   source = "terraform-aws-modules/eks/aws//modules/karpenter"
 
   cluster_name = module.eks.cluster_name
@@ -71,8 +60,9 @@ module "karpenter" {
     Terraform = "true"
   }
 }
+*/
 
-/*module "karpenter_policy" {
+module "karpenter_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "~> 3.0"
 
@@ -141,7 +131,7 @@ module "iam_eks_role" {
 
   oidc_providers = {
     one = {
-      provider_arn               = "arn:aws:iam::872675253839:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/00D1DC25D3F21846E344589BA18A9ED1"
+      provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["karpenter:karpenter"]
     }
   }
@@ -193,4 +183,4 @@ resource "aws_iam_instance_profile" "karpenter" {
   name = "karpenterNodeInstanceProfile"
   role = aws_iam_role.karpenter.name
 }
-*/
+
