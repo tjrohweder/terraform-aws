@@ -91,7 +91,8 @@ module "karpenter_policy" {
                 "ec2:CreateFleet",
                 "ec2:DescribeSpotPriceHistory",
                 "pricing:GetProducts",
-                "iam:PassRole"
+                "iam:PassRole",
+                "eks:DescribeCluster"
             ],
             "Effect": "Allow",
             "Resource": "*",
@@ -107,12 +108,6 @@ module "karpenter_policy" {
             "Effect": "Allow",
             "Resource": "*",
             "Sid": "ConditionalEC2Termination"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "eks:DescribeCluster",
-            "Resource": "arn:aws:eks:us-east-1:872675253839:cluster/main",
-            "Sid": "EKSClusterEndpointLookup"
         }
     ],
     "Version": "2012-10-17"
