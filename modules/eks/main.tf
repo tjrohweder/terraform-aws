@@ -90,7 +90,8 @@ module "karpenter_policy" {
                 "ec2:CreateLaunchTemplate",
                 "ec2:CreateFleet",
                 "ec2:DescribeSpotPriceHistory",
-                "pricing:GetProducts"
+                "pricing:GetProducts",
+                "iam:PassRole"
             ],
             "Effect": "Allow",
             "Resource": "*",
@@ -106,12 +107,6 @@ module "karpenter_policy" {
             "Effect": "Allow",
             "Resource": "*",
             "Sid": "ConditionalEC2Termination"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::872675253839:instance-profile/karpenterNodeInstanceProfile",
-            "Sid": "PassNodeIAMRole"
         },
         {
             "Effect": "Allow",
