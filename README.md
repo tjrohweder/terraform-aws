@@ -45,7 +45,7 @@ You must replace the placeholder with your actual bucket:
 ```bash
 terraform {
   backend "s3" {
-    bucket = "<YOUR_BUCKET_NAME>-terraform-tfstate"
+    bucket = "<placeholder>-terraform-tfstate"
     key    = "terraform.tfstate"
     region = "us-east-1"
   }
