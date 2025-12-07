@@ -30,6 +30,11 @@ variable "vpc" {
     create_egress_only_igw          = bool
     create_redshift_subnet_group    = bool
   })
+
+  validation {
+    condition     = can(cidrhost(var.vpc.cidr, 0))
+    error_message = "The VPC CIDR must be a valid IPv4 CIDR block."
+  }
 }
 
 variable "eks" {
