@@ -6,6 +6,7 @@ Each environment creates its own VPC and EKS cluster.
 ## Project Structure
 ```bash
 .
+├── .gitignore
 ├── README.md
 └── envs
     ├── dev
@@ -23,7 +24,7 @@ Each environment creates its own VPC and EKS cluster.
 ```
 
 ## Environments
-Each folder under envs/ represents an isolated Terraform environment:
+Each folder under `envs/` represents an isolated Terraform environment:
 
 **dev/** → Development infrastructure
 
@@ -45,7 +46,7 @@ You must replace the placeholder with your actual bucket:
 ```bash
 terraform {
   backend "s3" {
-    bucket = "<placeholder>-terraform-tfstate"
+    bucket = "<YourBucketName>-terraform-tfstate"
     key    = "terraform.tfstate"
     region = "us-east-1"
   }
